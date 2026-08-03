@@ -104,6 +104,9 @@ if "waiting_followup" not in st.session_state:
 
 if "original_message" not in st.session_state:
     st.session_state.original_message = ""
+
+
+
 # -------------------------
 # Language Selection
 # -------------------------

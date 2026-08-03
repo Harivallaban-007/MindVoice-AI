@@ -1,12 +1,10 @@
 from groq import Groq
-import os
-from dotenv import load_dotenv
+from groq import Groq
+from config import get_api_key
 
-load_dotenv()
 client = Groq(
-    api_key=os.getenv("GROQ_API_KEY")
+    api_key=get_api_key()
 )
-
 with open("audio.wav", "rb") as file:
 
     transcription = client.audio.transcriptions.create(

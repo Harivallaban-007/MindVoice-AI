@@ -1,13 +1,15 @@
 from groq import Groq
 import json
-import os
-from dotenv import load_dotenv
+from groq import Groq
+from config import get_api_key
 
 # Paste your Groq API key here
-load_dotenv()
+
+
 client = Groq(
-    api_key=os.getenv("GROQ_API_KEY")
-)  # Replace with your actual API key
+    api_key=get_api_key()
+)
+
 
 
 def improve_sentence(user_text, language, chat_history):

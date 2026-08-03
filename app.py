@@ -8,9 +8,6 @@
 # -------------------------
 import streamlit as st
 import speech_recognition as sr
-import os
-from dotenv import load_dotenv
-from groq import Groq
 
 # MindVoice AI function
 from mindvoice_ai import improve_sentence
@@ -20,21 +17,72 @@ from communication_tips import get_quick_tips
 # Groq Client
 # -------------------------
 # Paste your API key here
-load_dotenv()
-print(os.getenv("GROQ_API_KEY"))
+from groq import Groq
+from config import get_api_key
+
 client = Groq(
-    api_key=os.getenv("GROQ_API_KEY")
+    api_key=get_api_key()
 )
 
 # -------------------------
 # Streamlit Page Settings
 # -------------------------
 st.set_page_config(
-    page_title="MindVoice",
-    page_icon="🧠",
+    page_title="MindVoice | AI Communication Coach",
+    page_icon="🧠🎤",
     layout="centered"
 )
+st.markdown("""
+<style>
 
+.mindvoice-header {
+    background: linear-gradient(135deg, #00C853, #FF9800);
+    padding: 25px;
+    border-radius: 20px;
+    text-align: center;
+    color: white;
+    box-shadow: 0px 8px 25px rgba(0,0,0,0.25);
+    margin-bottom: 25px;
+}
+
+.logo {
+    font-size: 45px;
+    font-weight: 800;
+    letter-spacing: 1px;
+}
+
+.tagline {
+    font-size: 18px;
+    margin-top: 8px;
+    opacity: 0.95;
+}
+
+.subtitle {
+    font-size: 14px;
+    margin-top: 12px;
+}
+
+</style>
+""", unsafe_allow_html=True)
+
+
+st.markdown("""
+<div class="mindvoice-header">
+
+<div class="logo">
+🧠🎤 MindVoice
+</div>
+
+<div class="tagline">
+Speak Better, Regret Less
+</div>
+
+<div class="subtitle">
+AI Communication Coach • Understand • Improve • Communicate
+</div>
+
+</div>
+""", unsafe_allow_html=True)
 # -------------------------
 # Load Custom CSS
 # -------------------------
@@ -56,19 +104,6 @@ if "waiting_followup" not in st.session_state:
 
 if "original_message" not in st.session_state:
     st.session_state.original_message = ""
-
-# -------------------------
-# App Title
-# -------------------------
-st.title("🧠 MindVoice")
-
-st.markdown("""
-### Speak Better, Regret Less
-
-##### 🤖 Your AI Communication Coach
----
-""")
-
 # -------------------------
 # Language Selection
 # -------------------------

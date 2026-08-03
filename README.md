@@ -87,38 +87,8 @@ We often know *what* we want to say — but not always *how* to say it right.
 
 ---
 
-## 🚀 Getting Started
 
-```bash
-# Clone the repository
-git clone https://github.com/<your-username>/mindvoice-ai.git
-cd mindvoice-ai
 
-# Install dependencies
-pip install -r requirements.txt
-
-# Add your Groq API key
-export GROQ_API_KEY="your-api-key-here"
-
-# Run the app
-streamlit run app.py
-```
-
----
-
-## 📸 Demo
-
-<div align="center">
-
-*(Add screenshots or a demo GIF here)*
-
-| Home Screen | Communication Score | Reply Suggestions |
-|---|---|---|
-| 🖼️ | 🖼️ | 🖼️ |
-
-</div>
-
----
 
 ## 🚀 Future Roadmap
 

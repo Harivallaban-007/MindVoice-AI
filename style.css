@@ -1,0 +1,153 @@
+/* =====================================================
+   MindVoice Premium UI - Part 9
+===================================================== */
+
+
+/* Main Background */
+
+.stApp {
+    background: linear-gradient(
+        135deg,
+        #0f2027,
+        #203a43,
+        #2c5364
+    );
+}
+
+
+/* Title */
+
+h1 {
+
+    text-align: center;
+
+    font-size: 55px !important;
+
+    background: linear-gradient(
+        90deg,
+        #00f2fe,
+        #4facfe
+    );
+
+    -webkit-background-clip: text;
+
+    -webkit-text-fill-color: transparent;
+
+}
+
+
+/* Subtitle */
+
+h3 {
+
+    text-align: center;
+
+    color: white;
+
+}
+
+
+/* Glass Cards */
+
+div[data-testid="stChatMessage"] {
+
+    background: rgba(255,255,255,0.12);
+
+    backdrop-filter: blur(15px);
+
+    border-radius: 20px;
+
+    padding: 15px;
+
+    margin-bottom: 15px;
+
+    border: 1px solid rgba(255,255,255,0.2);
+
+}
+
+
+/* Buttons */
+
+.stButton button {
+
+    width: 100%;
+
+    border-radius: 15px;
+
+    height: 45px;
+
+    font-size: 18px;
+
+    font-weight: bold;
+
+}
+
+
+/* Text Input */
+
+.stTextInput input {
+
+    border-radius: 20px;
+
+    padding: 15px;
+
+    font-size: 18px;
+
+}
+
+
+/* Hide Streamlit Menu */
+
+#MainMenu {
+
+    visibility: hidden;
+
+}
+
+
+footer {
+
+    visibility: hidden;
+
+}
+/* =====================================================
+   Part 10 : Input Enhancement
+===================================================== */
+
+
+.stTextInput input {
+
+    background: rgba(255,255,255,0.15);
+
+    color: white;
+
+    border: 1px solid rgba(255,255,255,0.3);
+
+}
+
+
+.stTextInput input::placeholder {
+
+    color: #dddddd;
+
+}
+
+
+.stButton button {
+
+    background: rgba(255,255,255,0.15);
+
+    color: white;
+
+    border: 1px solid rgba(255,255,255,0.3);
+
+    transition: 0.3s;
+
+}
+
+
+.stButton button:hover {
+
+    transform: scale(1.05);
+
+}

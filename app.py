@@ -228,6 +228,11 @@ if voice_clicked:
         # Show user message
         with st.chat_message("user"):
             st.write(text)
+            
+        # Make voice input behave like text input
+        user_input = text
+        
+        
 
     except Exception as e:
         st.error(e)

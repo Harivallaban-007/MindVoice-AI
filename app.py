@@ -53,9 +53,11 @@ if "original_message" not in st.session_state:
 
 with st.sidebar:
 
+    st.image("assets/logo.svg", width=90)
+
     st.markdown("""
     <div class="sidebar-logo">
-        🧠🎤 <span class="sidebar-title">MindVoice</span>
+        <span class="sidebar-title">MindVoice</span>
         <div class="sidebar-tagline">Speak Better, Regret Less</div>
     </div>
     """, unsafe_allow_html=True)
@@ -99,9 +101,10 @@ with st.sidebar:
 col_title, col_toggle = st.columns([5, 1])
 
 with col_title:
+    st.image("assets/logo.svg", width=110)
     st.markdown("""
     <div class="main-header">
-        <h1>🧠🎤 MindVoice</h1>
+        <h1>MindVoice</h1>
         <p>Your AI Communication Assistant</p>
     </div>
     """, unsafe_allow_html=True)

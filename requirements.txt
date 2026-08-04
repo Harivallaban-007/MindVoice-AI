@@ -2,3 +2,4 @@ streamlit
 groq
 SpeechRecognition
 python-dotenv
+streamlit-option-menu

@@ -1,153 +1,131 @@
 /* =====================================================
-   MindVoice Premium UI - Part 9
+   MindVoice Premium UI
 ===================================================== */
-
 
 /* Main Background */
-
 .stApp {
-    background: linear-gradient(
-        135deg,
-        #0f2027,
-        #203a43,
-        #2c5364
-    );
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
 }
 
-
-/* Title */
-
-h1 {
-
-    text-align: center;
-
-    font-size: 55px !important;
-
-    background: linear-gradient(
-        90deg,
-        #00f2fe,
-        #4facfe
-    );
-
+/* Main Header */
+.main-header h1 {
+    font-size: 42px !important;
+    font-weight: 800;
+    background: linear-gradient(90deg, #00C853, #FF9800);
     -webkit-background-clip: text;
-
     -webkit-text-fill-color: transparent;
-
+    margin-bottom: 0px;
 }
 
+.main-header p {
+    color: #cfd8dc;
+    font-size: 15px;
+    margin-top: -5px;
+}
 
-/* Subtitle */
+/* ================= SIDEBAR ================= */
 
-h3 {
+section[data-testid="stSidebar"] {
+    background: #0b1d26;
+    border-right: 1px solid rgba(255,255,255,0.08);
+}
 
+.sidebar-logo {
     text-align: center;
-
+    padding: 15px 0 20px 0;
+    font-size: 22px;
+    font-weight: 800;
     color: white;
-
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    margin-bottom: 15px;
 }
 
+.sidebar-title {
+    background: linear-gradient(90deg, #00C853, #FF9800);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
 
-/* Glass Cards */
+.sidebar-tagline {
+    font-size: 12px;
+    color: #9aa5ab;
+    font-weight: 400;
+    margin-top: 4px;
+}
+
+.sidebar-quote {
+    margin-top: 25px;
+    padding: 15px;
+    border-left: 3px solid #00C853;
+    background: rgba(255,255,255,0.05);
+    border-radius: 10px;
+    font-size: 13px;
+    color: #dddddd;
+    line-height: 1.6;
+}
+
+/* ================= CHAT BUBBLES ================= */
 
 div[data-testid="stChatMessage"] {
-
     background: rgba(255,255,255,0.12);
-
     backdrop-filter: blur(15px);
-
     border-radius: 20px;
-
     padding: 15px;
-
     margin-bottom: 15px;
-
     border: 1px solid rgba(255,255,255,0.2);
-
 }
 
+/* User bubble - green accent */
+div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarUser"]) {
+    border-left: 3px solid #00C853;
+}
 
-/* Buttons */
+/* Assistant bubble - orange accent */
+div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarAssistant"]) {
+    border-left: 3px solid #FF9800;
+}
+
+/* ================= BUTTONS ================= */
 
 .stButton button {
-
     width: 100%;
-
     border-radius: 15px;
-
     height: 45px;
-
-    font-size: 18px;
-
+    font-size: 16px;
     font-weight: bold;
-
-}
-
-
-/* Text Input */
-
-.stTextInput input {
-
-    border-radius: 20px;
-
-    padding: 15px;
-
-    font-size: 18px;
-
-}
-
-
-/* Hide Streamlit Menu */
-
-#MainMenu {
-
-    visibility: hidden;
-
-}
-
-
-footer {
-
-    visibility: hidden;
-
-}
-/* =====================================================
-   Part 10 : Input Enhancement
-===================================================== */
-
-
-.stTextInput input {
-
     background: rgba(255,255,255,0.15);
-
     color: white;
-
     border: 1px solid rgba(255,255,255,0.3);
-
-}
-
-
-.stTextInput input::placeholder {
-
-    color: #dddddd;
-
-}
-
-
-.stButton button {
-
-    background: rgba(255,255,255,0.15);
-
-    color: white;
-
-    border: 1px solid rgba(255,255,255,0.3);
-
     transition: 0.3s;
-
 }
-
 
 .stButton button:hover {
-
-    transform: scale(1.05);
-
+    transform: scale(1.03);
 }
+
+/* Primary button (Start Listening) - gradient like Image 2 */
+.stButton button[kind="primary"] {
+    background: linear-gradient(90deg, #00C853, #FF9800);
+    border: none;
+    color: white;
+}
+
+/* ================= TEXT INPUT ================= */
+
+.stTextInput input {
+    border-radius: 20px;
+    padding: 15px;
+    font-size: 16px;
+    background: rgba(255,255,255,0.15);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+.stTextInput input::placeholder {
+    color: #dddddd;
+}
+
+/* ================= MISC ================= */
+
+#MainMenu { visibility: hidden; }
+footer { visibility: hidden; }

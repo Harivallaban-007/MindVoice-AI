@@ -1,22 +1,15 @@
 # =====================================================
 # MindVoice - AI Communication Coach
-# Part 1 : Imports + Page Setup + CSS + Chat History
+# Part 1 : Imports + Page Setup + Sidebar Navigation
 # =====================================================
 
-# -------------------------
-# Import required libraries
-# -------------------------
 import streamlit as st
 import speech_recognition as sr
+from streamlit_option_menu import option_menu   # NEW: pip install streamlit-option-menu
 
-# MindVoice AI function
 from mindvoice_ai import improve_sentence
 from communication_tips import get_quick_tips
 
-# -------------------------
-# Groq Client
-# -------------------------
-# Paste your API key here
 from groq import Groq
 from config import get_api_key
 
@@ -30,59 +23,9 @@ client = Groq(
 st.set_page_config(
     page_title="MindVoice | AI Communication Coach",
     page_icon="🧠🎤",
-    layout="centered"
+    layout="wide"          # CHANGED: centered -> wide (sidebar ku space)
 )
-st.markdown("""
-<style>
 
-.mindvoice-header {
-    background: linear-gradient(135deg, #00C853, #FF9800);
-    padding: 25px;
-    border-radius: 20px;
-    text-align: center;
-    color: white;
-    box-shadow: 0px 8px 25px rgba(0,0,0,0.25);
-    margin-bottom: 25px;
-}
-
-.logo {
-    font-size: 45px;
-    font-weight: 800;
-    letter-spacing: 1px;
-}
-
-.tagline {
-    font-size: 18px;
-    margin-top: 8px;
-    opacity: 0.95;
-}
-
-.subtitle {
-    font-size: 14px;
-    margin-top: 12px;
-}
-
-</style>
-""", unsafe_allow_html=True)
-
-
-st.markdown("""
-<div class="mindvoice-header">
-
-<div class="logo">
-🧠🎤 MindVoice
-</div>
-
-<div class="tagline">
-Speak Better, Regret Less
-</div>
-
-<div class="subtitle">
-AI Communication Coach • Understand • Improve • Communicate
-</div>
-
-</div>
-""", unsafe_allow_html=True)
 # -------------------------
 # Load Custom CSS
 # -------------------------
@@ -93,339 +36,314 @@ with open("style.css") as f:
     )
 
 # -------------------------
-# Chat History
+# Session State
 # -------------------------
 if "messages" not in st.session_state:
     st.session_state.messages = []
 
-# Follow-up State
 if "waiting_followup" not in st.session_state:
     st.session_state.waiting_followup = False
 
 if "original_message" not in st.session_state:
     st.session_state.original_message = ""
 
-
-
-# -------------------------
-# Language Selection
-# -------------------------
-language = st.selectbox(
-    "🌐 Language",
-    ["English", "தமிழ்","Auto Detect"]
-)
-
-# Whisper language code
-if language == "தமிழ்":
-    whisper_lang = "ta"
-else:
-    whisper_lang = "en"
-
-st.write("Selected Language:", language)
-
-st.markdown("---")
-
-# -------------------------
-# Display Chat History
-# -------------------------
-
-for message in st.session_state.messages:
-
-    with st.chat_message(message["role"]):
-
-        st.write(message["content"])
-
-# -------------------------
-# Clear Chat Button
-# -------------------------
-if st.button("🗑️ Clear Chat"):
-
-    st.session_state.messages = []
-
-    if "text_input" in st.session_state:
-        st.session_state.text_input = ""
-
-    st.rerun()
-
-st.markdown("---")
-
 # =====================================================
-# Part 2 : Text Input + Microphone UI
+# Part 2 : SIDEBAR (Logo + Nav Menu + Quote) - NEW
 # =====================================================
 
-# -------------------------
-# Input Area
-# -------------------------
-col_input, col_mic = st.columns([6, 1])
+with st.sidebar:
 
-# Text Input
-with col_input:
-   user_input = st.text_input(
-    "Message",
-    placeholder="💬Share What's on Your Mind...",
-    key="text_input",
-    label_visibility="collapsed"
-)
-# Microphone Button
-with col_mic:
-    
-    st.write("")  # Small spacing
+    st.markdown("""
+    <div class="sidebar-logo">
+        🧠🎤 <span class="sidebar-title">MindVoice</span>
+        <div class="sidebar-tagline">Speak Better, Regret Less</div>
+    </div>
+    """, unsafe_allow_html=True)
 
-    voice_clicked = st.button(
-        "🎙️",
-
-        use_container_width=True
+    selected = option_menu(
+        menu_title=None,
+        options=["Chat", "History", "Insights", "Settings", "About"],
+        icons=["chat-dots", "clock-history", "bar-chart-line", "gear", "info-circle"],
+        default_index=0,
+        styles={
+            "container": {"padding": "0!important", "background-color": "transparent"},
+            "icon": {"color": "#00C853", "font-size": "16px"},
+            "nav-link": {
+                "font-size": "15px",
+                "text-align": "left",
+                "margin": "4px 0",
+                "color": "#dddddd",
+                "border-radius": "10px",
+                "padding": "10px 14px"
+            },
+            "nav-link-selected": {
+                "background-color": "rgba(0,200,83,0.18)",
+                "color": "#00C853",
+                "font-weight": "600"
+            },
+        }
     )
 
-st.markdown("---")
+    st.markdown("""
+    <div class="sidebar-quote">
+        "Think before you speak."<br>
+        <span style="color:#00C853; font-weight:600;">Speak better.</span>
+        <span style="color:#FF9800; font-weight:600;"> Regret less.</span>
+    </div>
+    """, unsafe_allow_html=True)
 
 # =====================================================
-# Part 3 : Voice Input (Speech to Text)
+# Part 3 : MAIN HEADER (Title + Listening Mode Toggle)
 # =====================================================
 
-if voice_clicked:
+col_title, col_toggle = st.columns([5, 1])
 
-    recognizer = sr.Recognizer()
+with col_title:
+    st.markdown("""
+    <div class="main-header">
+        <h1>🧠🎤 MindVoice</h1>
+        <p>Your AI Communication Assistant</p>
+    </div>
+    """, unsafe_allow_html=True)
 
-    with sr.Microphone() as source:
+with col_toggle:
+    st.write("")
+    st.write("")
+    listening_mode = st.toggle("🟠 Listening Mode", value=False)
 
-        st.info("🎤 Listening... Speak now!")
 
-        # Reduce background noise
-        recognizer.adjust_for_ambient_noise(source)
+# =====================================================
+# Part 4 : PAGE ROUTING
+# =====================================================
 
-        # Record voice
-        audio = recognizer.listen(source)
+if selected == "Chat":
 
-    try:
+    # -------------------------
+    # Language Selection
+    # -------------------------
+    language = st.selectbox(
+        "🌐 Language",
+        ["English", "தமிழ்", "Auto Detect"]
+    )
 
-        # Save recorded audio
-        with open("audio.wav", "wb") as f:
-            f.write(audio.get_wav_data())
+    whisper_lang = "ta" if language == "தமிழ்" else "en"
 
-        # Convert Speech → Text using Groq Whisper
-        with open("audio.wav", "rb") as file:
+    st.write("Selected Language:", language)
 
-            transcription = client.audio.transcriptions.create(
-                file=file,
-                model="whisper-large-v3",
-                language=whisper_lang
+    # -------------------------
+    # Clear Chat + Start Listening Row
+    # -------------------------
+    col_clear, col_listen = st.columns([1, 2])
+
+    with col_clear:
+        if st.button("🗑️ Clear Chat", use_container_width=True):
+            st.session_state.messages = []
+            if "text_input" in st.session_state:
+                st.session_state.text_input = ""
+            st.rerun()
+
+    with col_listen:
+        voice_clicked = st.button(
+            "🎙️ Start Listening",
+            use_container_width=True,
+            type="primary"
+        )
+
+    st.markdown("---")
+
+    # -------------------------
+    # Display Chat History
+    # -------------------------
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.write(message["content"])
+
+    # -------------------------
+    # Text Input Row
+    # -------------------------
+    user_input = st.text_input(
+        "Message",
+        placeholder="💬 Type your message...",
+        key="text_input",
+        label_visibility="collapsed"
+    )
+
+    st.markdown("---")
+
+    # =====================================================
+    # Part 5 : Voice Input (Speech to Text)
+    # =====================================================
+
+    if voice_clicked:
+
+        recognizer = sr.Recognizer()
+
+        with sr.Microphone() as source:
+            st.info("🎤 Listening... Speak now!")
+            recognizer.adjust_for_ambient_noise(source)
+            audio = recognizer.listen(source)
+
+        try:
+            with open("audio.wav", "wb") as f:
+                f.write(audio.get_wav_data())
+
+            with open("audio.wav", "rb") as file:
+                transcription = client.audio.transcriptions.create(
+                    file=file,
+                    model="whisper-large-v3",
+                    language=whisper_lang
+                )
+
+            text = transcription.text
+            st.success("✅ Speech Recognized")
+
+            st.session_state.messages.append(
+                {"role": "user", "content": text}
             )
 
-        # Recognized text
-        text = transcription.text
+            with st.chat_message("user"):
+                st.write(text)
 
-        st.success("✅ Speech Recognized")
+            user_input = text
 
-        # Save user message in chat history
+        except Exception as e:
+            st.error(e)
+
+    # =====================================================
+    # Part 6 : MindVoice AI Response (unchanged logic)
+    # =====================================================
+
+    if user_input:
+
+        if st.session_state.waiting_followup:
+            user_input = f"""
+        Original Message:
+        {st.session_state.original_message}
+
+        Additional Information:
+        {user_input}
+        """
+            st.session_state.waiting_followup = False
+            st.session_state.original_message = ""
+
         st.session_state.messages.append(
-            {
-                "role": "user",
-                "content": text
-            }
+            {"role": "user", "content": user_input}
         )
 
-        # Show user message
         with st.chat_message("user"):
-            st.write(text)
-            
-        # Make voice input behave like text input
-        user_input = text
-        
-        
+            st.write(user_input)
 
-    except Exception as e:
-        st.error(e)
-# =====================================================
-# Part 4 : MindVoice AI Response
-# =====================================================
+        tips = get_quick_tips(user_input)
 
-# -------------------------
-# Text Input Processing
-# -------------------------
+        if tips:
+            st.markdown("### 💡 Quick Suggestions")
+            for tip in tips:
+                st.info(tip)
 
-if user_input:
-    # Combine follow-up answer with original message
-    if st.session_state.waiting_followup:
+        with st.spinner("🧠 MindVoice thinking..."):
+            chat_history = ""
+            for msg in st.session_state.messages:
+                chat_history += f"{msg['role']}: {msg['content']}\n"
 
-        user_input = f"""
-    Original Message:
-    {st.session_state.original_message}
+            response = improve_sentence(
+                user_input,
+                language,
+                chat_history
+            )
 
-    Additional Information:
-    {user_input}
-    """
+        if response["needs_followup"]:
+            st.session_state.waiting_followup = True
+            st.session_state.original_message = user_input
 
-        st.session_state.waiting_followup = False
-        st.session_state.original_message = ""
+            st.warning("💬 I need a little more information.")
+            st.info(response["followup_question"])
 
-    # Save user message
-    st.session_state.messages.append(
-        {
-            "role": "user",
-            "content": user_input
-        }
+            st.stop()
+
+        assistant_reply = f"""
+        🧠 Emotion: {response['emotion']}
+
+        🎯 Intent: {response['intent']}
+
+        😊 Friendly:
+        {response['friendly']}
+
+        💼 Professional:
+        {response['professional']}
+
+        🙏 Polite:
+        {response['polite']}
+        """
+
+        st.session_state.messages.append(
+            {"role": "assistant", "content": assistant_reply}
+        )
+
+        with st.chat_message("assistant"):
+
+            st.markdown("## 🧠 MindVoice Analysis")
+
+            emotion = response["emotion"].lower()
+
+            emotion_emoji = {
+                "anger": "😡",
+                "sadness": "😢",
+                "happiness": "😊",
+                "fear": "😨",
+                "neutral": "😐"
+            }
+
+            emoji = emotion_emoji.get(emotion, "🧠")
+
+            st.info(f"🧠 Emotion\n\n{emoji} {response['emotion']}")
+            st.info(f"🎯 Intent\n\n{response['intent']}")
+
+            score = int(response["score"])
+            st.success(f"📊 Communication Score\n\n⭐ {score} / 10")
+            st.progress(score / 10)
+
+            if score >= 9:
+                st.success("🟢 Excellent Communication")
+            elif score >= 7:
+                st.info("🟡 Good Communication")
+            elif score >= 5:
+                st.warning("🟠 Needs Improvement")
+            else:
+                st.error("🔴 Poor Communication")
+
+            st.markdown("### 💡 Quick Suggestions")
+            for quick_tip in response["quick_tips"]:
+                st.info(f"✔ {quick_tip}")
+
+            st.write(f"💭 **MindVoice Insight:**\n\n{response['insight']}")
+
+            st.markdown("### 😊 Friendly")
+            st.write(response["friendly"])
+
+            st.markdown("### 💼 Professional")
+            st.write(response["professional"])
+
+            st.markdown("### 🙏 Polite")
+            st.write(response["polite"])
+
+            st.warning(f"💡 MindVoice Tip\n\n{response['tip']}")
+
+
+elif selected == "History":
+    st.markdown("### 📜 Chat History")
+    st.info("Full history view — coming soon.")
+
+elif selected == "Insights":
+    st.markdown("### 📊 Communication Insights")
+    st.info("Analytics dashboard — coming soon.")
+
+elif selected == "Settings":
+    st.markdown("### ⚙️ Settings")
+    st.info("App settings — coming soon.")
+
+elif selected == "About":
+    st.markdown("### ℹ️ About MindVoice")
+    st.write(
+        "MindVoice is your AI Communication Coach — understand your emotions, "
+        "improve your message, and communicate better in English, Tamil, or Tanglish."
     )
-
-    with st.chat_message("user"):
-        st.write(user_input)
-
-     # Quick Suggestions
-    tips = get_quick_tips(user_input)
-
-    if tips:
-
-        st.markdown("### 💡 Quick Suggestions")
-
-        for tip in tips:
-            st.info(tip)
-
-
-    # AI Processing
-    with st.spinner("🧠 MindVoice thinking..."):
-
-        chat_history = ""
-
-        for msg in st.session_state.messages:
-            chat_history += f"{msg['role']}: {msg['content']}\n"
-
-        response = improve_sentence(
-            user_input,
-            language,
-            chat_history
-        )
-            
-    # Check if AI needs more information
-    if response["needs_followup"]:
-
-        st.session_state.waiting_followup = True
-        st.session_state.original_message = user_input
-
-        st.warning("💬 I need a little more information.")
-        st.info(response["followup_question"])
-
-        st.stop()
-    # =====================================================
-    # Part 6 : Smart AI Cards
-    # =====================================================
-    
-    # Save AI response
-    assistant_reply = f"""
-    🧠 Emotion: {response['emotion']}
-
-    🎯 Intent: {response['intent']}
-
-    😊 Friendly:
-    {response['friendly']}
-
-    💼 Professional:
-    {response['professional']}
-
-    🙏 Polite:
-    {response['polite']}
-    """
-
-    st.session_state.messages.append(
-        {
-            "role": "assistant",
-            "content": assistant_reply
-        }
-    )
-
-
-    # Display AI response
-
-    with st.chat_message("assistant"):
-
-        st.markdown("## 🧠 MindVoice Analysis")
-
-
-        # Emotion Card
-        # =====================================================
-        # Part 7 : Premium UI Upgrade
-        # =====================================================
-
-        # Emotion Emoji
-
-        emotion = response["emotion"].lower()
-
-        emotion_emoji = {
-            "anger": "😡",
-            "sadness": "😢",
-            "happiness": "😊",
-            "fear": "😨",
-            "neutral": "😐"
-        }
-
-        emoji = emotion_emoji.get(
-            emotion,
-            "🧠"
-        )
-
-
-        # Emotion Card
-
-        st.info(
-            f"🧠 Emotion\n\n{emoji} {response['emotion']}"
-        )
-        # Intent Card
-        st.info(
-            f"🎯 Intent\n\n{response['intent']}"
-        )
-
-
-        # Score Card
-        score = int(response["score"])
-
-
-        st.success(
-            f"📊 Communication Score\n\n⭐ {score} / 10"
-        )
-
-
-        st.progress(score / 10)
-        # Score Feedback
-
-        if score >= 9:
-            st.success("🟢 Excellent Communication")
-
-        elif score >= 7:
-            st.info("🟡 Good Communication")
-
-        elif score >= 5:
-            st.warning("🟠 Needs Improvement")
-
-        else:
-            st.error("🔴 Poor Communication")
-
-        # Quick Suggestions
-        st.markdown("### 💡 Quick Suggestions")
-
-        for quick_tip in response["quick_tips"]:
-            st.info(f"✔ {quick_tip}")
-
-        # Insight
-        st.write(
-            f"💭 **MindVoice Insight:**\n\n{response['insight']}"
-        )
-
-
-        # Friendly
-        st.markdown("### 😊 Friendly")
-        st.write(response["friendly"])
-
-
-        # Professional
-        st.markdown("### 💼 Professional")
-        st.write(response["professional"])
-
-
-        # Polite
-        st.markdown("### 🙏 Polite")
-        st.write(response["polite"])
-
-
-        # Tip
-        st.warning(
-            f"💡 MindVoice Tip\n\n{response['tip']}"
-        )

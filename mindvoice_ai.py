@@ -54,6 +54,8 @@ def improve_sentence(user_text, language, chat_history):
     prompt = f"""
 You are MindVoice AI Communication Coach.
 
+
+
 The user may communicate in:
 - English
 - Tamil

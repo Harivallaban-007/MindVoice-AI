@@ -125,6 +125,72 @@ div[data-testid="stChatMessage"]:has(div[data-testid="stChatMessageAvatarAssista
     color: #dddddd;
 }
 
+/* ================= FLOATING MIC BUTTON (merged into input pill) ================= */
+/* .mic-anchor is an invisible marker placed right before the mic button.
+   Streamlit wraps every widget in its own container div, so we use :has()
+   to find the container that HOLDS the anchor, then jump to the very next
+   container (the mic button's own wrapper) and pin the button inside it. */
+
+div[data-testid="stElementContainer"]:has(.mic-anchor) + div[data-testid="stElementContainer"] button,
+div.element-container:has(.mic-anchor) + div.element-container button {
+    position: fixed !important;
+    bottom: 18px !important;
+    right: 26px !important;
+    z-index: 9999 !important;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    padding: 0;
+    font-size: 19px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #FF5252, #FF9800);
+    border: 2px solid #0b1d26;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.45);
+    transition: 0.2s ease;
+}
+
+div[data-testid="stElementContainer"]:has(.mic-anchor) + div[data-testid="stElementContainer"] button:hover,
+div.element-container:has(.mic-anchor) + div.element-container button:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.55);
+}
+
+/* ================= FIXED BOTTOM CHAT INPUT — clean merged pill ================= */
+
+div[data-testid="stChatInput"] {
+    background: transparent;
+    border: none;
+    padding: 10px 90px 18px 20px;   /* right space reserved for mic circle */
+    max-width: 900px;
+    margin: 0 auto;
+}
+
+div[data-testid="stChatInput"] textarea {
+    background: #16303d !important;
+    color: white !important;
+    border-radius: 28px !important;
+    border: 1px solid rgba(255,255,255,0.15) !important;
+    padding: 14px 20px !important;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+}
+
+div[data-testid="stChatInput"] textarea:focus {
+    border: 1px solid #00C853 !important;
+    box-shadow: 0 0 0 2px rgba(0,200,83,0.25);
+}
+
+div[data-testid="stChatInput"] textarea::placeholder {
+    color: #8fa0a8 !important;
+}
+
+/* Streamlit's own send arrow button, restyled to match the accent */
+div[data-testid="stChatInput"] button {
+    background: linear-gradient(135deg, #00C853, #00E676) !important;
+    border-radius: 50% !important;
+}
+
 /* ================= MISC ================= */
 
 #MainMenu { visibility: hidden; }

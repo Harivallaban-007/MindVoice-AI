@@ -5,6 +5,8 @@
 
 import streamlit as st
 import speech_recognition as sr
+import datetime
+import pandas as pd
 from streamlit_option_menu import option_menu   # NEW: pip install streamlit-option-menu
 
 from mindvoice_ai import improve_sentence
@@ -46,6 +48,9 @@ if "waiting_followup" not in st.session_state:
 
 if "original_message" not in st.session_state:
     st.session_state.original_message = ""
+
+if "history_log" not in st.session_state:          # NEW: stores every analyzed message for History/Insights
+    st.session_state.history_log = []
 
 # =====================================================
 # Part 2 : SIDEBAR (Logo + Nav Menu + Quote) - NEW
@@ -134,23 +139,11 @@ if selected == "Chat":
     st.write("Selected Language:", language)
 
     # -------------------------
-    # Clear Chat + Start Listening Row
+    # Clear Chat
     # -------------------------
-    col_clear, col_listen = st.columns([1, 2])
-
-    with col_clear:
-        if st.button("🗑️ Clear Chat", use_container_width=True):
-            st.session_state.messages = []
-            if "text_input" in st.session_state:
-                st.session_state.text_input = ""
-            st.rerun()
-
-    with col_listen:
-        voice_clicked = st.button(
-            "🎙️ Start Listening",
-            use_container_width=True,
-            type="primary"
-        )
+    if st.button("🗑️ Clear Chat"):
+        st.session_state.messages = []
+        st.rerun()
 
     st.markdown("---")
 
@@ -162,16 +155,15 @@ if selected == "Chat":
             st.write(message["content"])
 
     # -------------------------
-    # Text Input Row
+    # Floating Mic Button (fixed near bottom bar, ChatGPT-style)
     # -------------------------
-    user_input = st.text_input(
-        "Message",
-        placeholder="💬 Type your message...",
-        key="text_input",
-        label_visibility="collapsed"
-    )
+    st.markdown('<div class="mic-anchor"></div>', unsafe_allow_html=True)
+    voice_clicked = st.button("🎙️", key="mic_button")
 
-    st.markdown("---")
+    # -------------------------
+    # Fixed Bottom Chat Input (ChatGPT / Gemini / Claude style)
+    # -------------------------
+    user_input = st.chat_input("Type your message...")
 
     # =====================================================
     # Part 5 : Voice Input (Speech to Text)
@@ -179,14 +171,26 @@ if selected == "Chat":
 
     if voice_clicked:
 
-        recognizer = sr.Recognizer()
-
-        with sr.Microphone() as source:
-            st.info("🎤 Listening... Speak now!")
-            recognizer.adjust_for_ambient_noise(source)
-            audio = recognizer.listen(source)
-
         try:
+            # Check a mic actually exists before trying to open one
+            mic_names = sr.Microphone.list_microphone_names()
+
+            if not mic_names:
+                st.error(
+                    "🎙️ No microphone found on this device.\n\n"
+                    "Check: (1) a mic is physically connected, "
+                    "(2) Windows Settings → Privacy → Microphone → "
+                    "'Allow apps to access your microphone' is turned ON."
+                )
+                st.stop()
+
+            recognizer = sr.Recognizer()
+
+            with sr.Microphone() as source:
+                st.info("🎤 Listening... Speak now!")
+                recognizer.adjust_for_ambient_noise(source)
+                audio = recognizer.listen(source)
+
             with open("audio.wav", "wb") as f:
                 f.write(audio.get_wav_data())
 
@@ -209,8 +213,14 @@ if selected == "Chat":
 
             user_input = text
 
+        except OSError:
+            st.error(
+                "🎙️ No default input device available. Please check that "
+                "a microphone is connected and enabled, then try again."
+            )
+
         except Exception as e:
-            st.error(e)
+            st.error(f"Something went wrong: {e}")
 
     # =====================================================
     # Part 6 : MindVoice AI Response (unchanged logic)
@@ -262,6 +272,16 @@ if selected == "Chat":
             st.info(response["followup_question"])
 
             st.stop()
+
+        # NEW: log this analyzed message for History + Insights pages
+        st.session_state.history_log.append({
+            "date": datetime.datetime.now().strftime("%d %b %Y"),
+            "time": datetime.datetime.now().strftime("%I:%M %p"),
+            "message": user_input,
+            "emotion": response["emotion"],
+            "intent": response["intent"],
+            "score": int(response["score"])
+        })
 
         assistant_reply = f"""
         🧠 Emotion: {response['emotion']}
@@ -333,12 +353,70 @@ if selected == "Chat":
 
 
 elif selected == "History":
+
     st.markdown("### 📜 Chat History")
-    st.info("Full history view — coming soon.")
+
+    if not st.session_state.history_log:
+        st.info("No conversations yet. Chat with MindVoice to build your history!")
+
+    else:
+        if st.button("🗑️ Clear History"):
+            st.session_state.history_log = []
+            st.rerun()
+
+        st.markdown("---")
+
+        # Most recent conversation first
+        for entry in reversed(st.session_state.history_log):
+
+            score = entry["score"]
+
+            if score >= 8:
+                badge = "🟢"
+            elif score >= 5:
+                badge = "🟡"
+            else:
+                badge = "🔴"
+
+            preview = entry["message"].strip().replace("\n", " ")
+            if len(preview) > 55:
+                preview = preview[:55] + "..."
+
+            with st.expander(f"{badge}  {preview}   —   {entry['date']} · {entry['time']}"):
+                st.write(f"**Message:** {entry['message']}")
+                st.write(f"**🧠 Emotion:** {entry['emotion']}")
+                st.write(f"**🎯 Intent:** {entry['intent']}")
+                st.write(f"**📊 Score:** {score} / 10")
+
 
 elif selected == "Insights":
+
     st.markdown("### 📊 Communication Insights")
-    st.info("Analytics dashboard — coming soon.")
+
+    if not st.session_state.history_log:
+        st.info("No data yet. Chat with MindVoice to see your insights!")
+
+    else:
+        df = pd.DataFrame(st.session_state.history_log)
+
+        # Summary metric cards
+        col1, col2, col3 = st.columns(3)
+        col1.metric("💬 Total Messages", len(df))
+        col2.metric("⭐ Average Score", round(df["score"].mean(), 1))
+        col3.metric("🏆 Best Score", int(df["score"].max()))
+
+        st.markdown("---")
+
+        st.markdown("#### 📈 Score Trend (over your conversations)")
+        st.line_chart(df["score"])
+
+        st.markdown("#### 😊 Emotion Breakdown")
+        emotion_counts = df["emotion"].value_counts()
+        st.bar_chart(emotion_counts)
+
+        st.markdown("#### 🎯 Most Common Intents")
+        intent_counts = df["intent"].value_counts()
+        st.bar_chart(intent_counts)
 
 elif selected == "Settings":
     st.markdown("### ⚙️ Settings")
